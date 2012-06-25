@@ -1,18 +1,15 @@
-express = require 'express'
+require('zappajs') ->
 
-exports.startServer = (port, path, callback = (->)) ->
+  mongoose = require 'mongoose'
+  db = mongoose.connect('mongodb://localhost/zapp_ember_database')
 
-    server = express.createServer()
+  Schema = mongoose.Schema
 
-    server.configure ->
-        server.use express.static path
-        server.set 'views', path
-        server.set 'view options', layout: no
-        server.register '.html', compile: (str, options) -> 
-            (locals) -> str
+  ContactSchema = new Schema
+    firstName: String
+    lastName: String
 
-    server.get '/', (req, res) ->
-        res.render 'index.html'
+  Contact = mongoose.model('Contact', ContactSchema)
 
-    server.listen parseInt port, 10
-    server.on 'listening', callback
+
+  @use 'static'
