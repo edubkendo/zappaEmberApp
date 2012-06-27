@@ -1,15 +1,12 @@
 require('zappajs') ->
-
-  mongoose = require 'mongoose'
-  db = mongoose.connect('mongodb://localhost/zapp_ember_database')
-
-  Schema = mongoose.Schema
-
-  ContactSchema = new Schema
-    firstName: String
-    lastName: String
-
-  Contact = mongoose.model('Contact', ContactSchema)
-
+  require('./server/model')(@app)
 
   @use 'static'
+
+  modelDel = (@q) ->
+    @app.Contact.find(@q, (err, docs) ->
+      doc.remove() for doc in docs
+    )
+
+  @on connection: ->
+    console.log 'Hello there! App is now connected.'
