@@ -8,5 +8,9 @@ require('zappajs') ->
       doc.remove() for doc in docs
     )
 
+  # Router
+  # @get '/' : ->
+  #   @Contacts = @app.Contact.find()
+
   @on connection: ->
     console.log 'Hello there! App is now connected.'
