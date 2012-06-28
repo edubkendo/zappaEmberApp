@@ -1,7 +1,9 @@
 require('zappajs') ->
   require('./server/model')(@app)
 
-  @use 'static'
+#  @use 'static'
+  @enable 'default layout'
+
 
   # Model utility functions to make implementing CRUD easier
 
@@ -18,19 +20,19 @@ require('zappajs') ->
       )
 
   modelDel = (@q) ->
-    @app.Contact.find(@q, (err, docs) ->
+    @app.Contact.find(@q._id, (err, docs) ->
       doc.remove() for doc in docs
     )
 
   modelEdit = (@contact) ->
-    @app.Contact.findById(@contact._id, (err, docs) ->
+    @app.Contact.findOne(@contact._id, (err, doc) =>
       if err
         console.log err
         err
       else
-        doc.firstName = @contact.firstName
-        doc.lastName = @contact.lastName
-        doc.save((err, doc) ->
+        doc?.firstName = @contact.firstName
+        doc?.lastName = @contact.lastName
+        doc?.save((err, doc) ->
           if err
             console.log err
             err
@@ -40,14 +42,22 @@ require('zappajs') ->
       )
 
   user = {}
-  user.firstName = "Bob"
-  user.lastName = "Bobb"
+  user.firstName = 'Bob'
+  user.lastName = 'Bobb'
   modelAdd user
 
+  userB = {}
+  userB.firstName = 'Bill'
+  userB.lastName = 'Billiams'
+  modelAdd userB
 
   # Router
-  # @get '/' : ->
-  #   @Contacts = @app.Contact.find()
+  @get '/': ->
+    @app.Contact.find({}, (err, docs) =>
+      Contacts = {}
+      @Contacts = Contacts: docs
+      @send @Contacts
+      )
 
   @on connection: ->
     console.log 'Hello there! App is now connected.'
