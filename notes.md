@@ -49,20 +49,61 @@ model = (@app) ->
 
 module.exports = model
 ```
-### Function to easily delete a model from the database.
+### Create Model Utility Functions
 
-Removing a user from the database proved to be a little tricky, so this is a helper function in server.coffee
+Removing a user from the database proved to be a little tricky, so we add these helper functions in server.coffee to make dealing with the database easier.
 
 ```coffee
 
+  modelAdd = (@contact) ->
+    newContact = new @app.Contact
+    newContact.firstName = @contact.firstName
+    newContact.lastName = @contact.lastName
+    newContact.save((err,doc) ->
+      if err
+        console.log err
+        return err
+      else
+        return null
+      )
+
   modelDel = (@q) ->
-    @app.Contact.find(@q, (err, docs) ->
+    @app.Contact.find(@q._id, (err, docs) ->
       doc.remove() for doc in docs
     )
 
+  modelEdit = (@contact) ->
+    @app.Contact.findOne(@contact._id, (err, doc) =>
+      if err
+        console.log err
+        err
+      else
+        doc?.firstName = @contact.firstName
+        doc?.lastName = @contact.lastName
+        doc?.save((err, doc) ->
+          if err
+            console.log err
+            err
+          else
+            null
+          )
+      )
+
+```
+### Routing server-side
+
+Ember-data expects the json wrapped in an object with the model name, so we set up our router like so:
+
+```coffee
+  @get '/': ->
+    @app.Contact.find({}, (err, docs) =>
+      Contacts = {}
+      @Contacts = Contacts: docs
+      @send @Contacts
+      )
 ```
 
-
+Notice we use the fat arrow here so we can retain the value of 'this' in our callback.
 
 
 ## Extra Notes
